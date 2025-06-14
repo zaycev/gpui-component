@@ -146,7 +146,7 @@ impl AppState {
     }
 }
 
-pub fn create_new_window<F, E>(title: &str, crate_view_fn: F, cx: &mut App)
+pub fn create_new_window<F, E>(title: &str, crate_view_fn: F, cx: &mut App, options: WindowOptions)
 where
     E: Into<AnyView>,
     F: FnOnce(&mut Window, &mut App) -> E + Send + 'static,
@@ -161,21 +161,6 @@ where
     let title = SharedString::from(title.to_string());
 
     cx.spawn(async move |cx| {
-        let options = WindowOptions {
-            window_bounds: Some(WindowBounds::Windowed(window_bounds)),
-            titlebar: Some(TitleBar::title_bar_options()),
-            window_min_size: Some(gpui::Size {
-                width: px(640.),
-                height: px(480.),
-            }),
-            kind: WindowKind::Normal,
-            #[cfg(target_os = "linux")]
-            window_background: gpui::WindowBackgroundAppearance::Transparent,
-            #[cfg(target_os = "linux")]
-            window_decorations: Some(gpui::WindowDecorations::Client),
-            ..Default::default()
-        };
-
         let window = cx
             .open_window(options, |window, cx| {
                 let view = crate_view_fn(window, cx);
